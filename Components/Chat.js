@@ -12,5 +12,24 @@ class Chat extends Component {
         });
 
         this.channel = this.pusher.subscribe('chat-room');
+
+        this.channel.bind('new-message', ({ chatt = null }) => {
+            const { chats } = this.state;
+            chat && chats.push(chat);
+            this.setState({ chats });
+        });
+
+        this.pusher.connection.bind('connected', () => {
+            axios.post('/messages').then(reponse => {
+                const chats = response.data.messages;
+                this.setState({ chats });
+            });
+        });
+    }
+
+    componentWillUnmount() {
+        this.pusher.disconnect();
     }
 }
+
+export default Chat;
